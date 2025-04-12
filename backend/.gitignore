@@ -1,0 +1,12 @@
+.env
+db.sqlite3
+venv/  
+.env
+.env.local
+__pycache__
+migrations
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.log
