@@ -1,18 +1,17 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-import {Script, console} from "forge-std/Script.sol";
-import {Counter} from "../src/Counter.sol";
+import "forge-std/Script.sol";
+import "../src/Counter.sol";
 
-contract CounterScript is Script {
-    Counter public counter;
+contract DeployTelegramMiniApp is Script {
+    function run() external {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-    function setUp() public {}
+        vm.startBroadcast(deployerPrivateKey);
 
-    function run() public {
-        vm.startBroadcast();
-
-        counter = new Counter();
+        TelegramMiniApp app = new TelegramMiniApp();
+        console2.log("TelegramMiniApp deployed at:", address(app));
 
         vm.stopBroadcast();
     }
