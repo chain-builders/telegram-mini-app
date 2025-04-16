@@ -30,12 +30,6 @@ class TelegramBot:
         self.contract = None
 
     def validate_env_vars(self):
-        print(self.alchemy_http_url)
-        print(self.contract_address)
-        print(self.contract_abi_path)
-        print(self.private_key)
-        print(self.token)
-        print(self.username)
         missing_vars = []
         if not self.alchemy_http_url:
             missing_vars.append("ALCHEMY_HTTP_URL")
@@ -56,7 +50,7 @@ class TelegramBot:
     def load_contract_abi(self):
         try:
             with open(self.contract_abi_path, 'r') as f:
-                return json.load(f)['abi']
+                return json.load(f)
         except FileNotFoundError:
             logger.error(f"ABI file not found at {self.contract_abi_path}")
             raise
@@ -75,8 +69,32 @@ class TelegramBot:
         print('Web3 connections initialized')
         print(self.contract)
 
+    def send_eth(self, recipient: str, amount: float) -> str:
+        if not self.http_w3:
+            self.initialize_web3_connections()
+
+        account = self.http_w3.eth.account.from_key(self.private_key)
+        txn = self.contract.functions.sendETH(
+            recipient
+        ).build_transaction({
+            'from': account.address,
+            'nonce': self.http_w3.eth.get_transaction_count(account.address),
+            'gas': 200000,
+            'gasPrice': self.http_w3.eth.gas_price,
+            'value': self.http_w3.to_wei(amount, 'ether'),
+            'chainId': 84532
+        })
+        signed_txn = self.http_w3.eth.account.sign_transaction(txn, self.private_key)
+        tx_hash = self.http_w3.eth.send_raw_transaction(signed_txn.raw_transaction)
+        print(f"Create Pool sent: {tx_hash.hex()}")
+        return {'tx_hash': tx_hash.hex(), 'status': 'pending'}
+
     def transfer(self, to_address: str, amount: float) -> str:
-        nonce = self.http_w3.eth.get_transaction_count(self.http_w3.eth.default_account)
+        default_account = self.http_w3.eth.default_account
+        print(f"Default account: {default_account}")
+        print(type(default_account))
+        print(f"Sending {amount} ETH to {to_address}")
+        nonce = self.http_w3.eth.get_transaction_count('0x58bd94230B41353D73A899C061A80F3205de87f0')
         gas_price = self.http_w3.eth.gas_price
         transaction = {
             'to': to_address,
@@ -84,21 +102,23 @@ class TelegramBot:
             'gas': 2000000,
             'gasPrice': gas_price,
             'nonce': nonce,
-            'chainId': 1  # Mainnet
+            'chainId': 11155111
         }
         
         signed_txn = self.http_w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
-        txn_hash = self.http_w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        txn_hash = self.http_w3.eth.send_raw_transaction(signed_txn.raw_transaction)
         return txn_hash.hex()
 
     def setup_app(self):
         self.app = ApplicationBuilder().token(self.token).build()
-        print('Telegram app initialized')
         self.app.add_handler(CommandHandler("start", self.start_command))
         self.app.add_handler(CommandHandler("help", self.help_command))
         self.app.add_handler(CommandHandler("custom", self.custom_command))
+        self.app.add_handler(CommandHandler("send", self.send_command))
         self.app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
         self.app.add_error_handler(self.error)
+        print('Telegram bot setup complete')
+        self.app.run_polling(poll_interval=3, timeout=10, drop_pending_updates=True)
 
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("Hello! I'm your base transaction bot. How can I assist you today?")
@@ -106,11 +126,28 @@ class TelegramBot:
         # await context.bot.send_message(chat_id=update.effective_chat.id, text="Hello! I'm your bot. How can I assist you today?")
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        await update.message.reply_text("Here are some commands you can use:\n/start - Start the bot\n/help - Get help\n/custom - Custom command")
+        await update.message.reply_text("Here are some commands you can use:\n/start - Start the bot\n/help - Get help\n/custom - Custom command\n/send - Send ETH to an address")
 
     async def custom_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        self.transfer('0xRecipientAddress', 0.01)  # Replace with actual recipient address and amount
-        await update.message.reply_text("This command has succesfully executed transaction!")
+        await update.message.reply_text("Use the following custom message to send ETH to an address.\nFormat: /send <address> <amount>")
+
+    async def send_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if len(context.args) != 2:
+            await update.message.reply_text("Usage: /send <address> <amount>")
+            return
+
+        recipient = context.args[0]
+        try:
+            amount = float(context.args[1])
+        except ValueError:
+            await update.message.reply_text("Invalid amount. Please enter a valid number.")
+            return
+
+        try:
+            tx_hash = self.send_eth(recipient, amount)
+            await update.message.reply_text(f"Transaction sent! Hash: {tx_hash}")
+        except Exception as e:
+            await update.message.reply_text(f"Error: {str(e)}")
 
     def handle_response(self, text: str) -> str:
         if 'hello' in text.lower():
@@ -146,4 +183,7 @@ class TelegramBot:
 
     async def error(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(f"Update {update} caused error {context.error}")
+
+    def transferFunds(self):
+        self.transfer('0xa38062B76617585a6DB4AF9759ef3A850B35Ed9a', 0.002)
     
