@@ -15,7 +15,7 @@
 - [Contributing](#-contributing)
 - [Why Base Network?](#-why-base-network)
 
-## 🌐 Project Overview
+## Project Overview
 
 Kirapod is an innovative multi-platform Web3 solution that combines:
 - **Telegram MiniApp**: Full-featured decentralized application with wallet functionality
@@ -29,7 +29,7 @@ Both platforms share:
 
 **Core Concept**: Bridge messaging platforms with decentralized finance through social identity abstraction.
 
-## 🚀 Key Features
+## Key Features
 
 ### Cross-Platform Wallet System
 - Single contract address serving both Telegram and WhatsApp interfaces
@@ -53,7 +53,7 @@ graph TD
     D --> E[Transaction History]
     E --> F[Social Graph Analysis]
 
-### Technical Architecture
+## Technical Architecture
 #### Smart Contract System
 - Base Network Deployment: All contracts deployed on Base mainnet
 
@@ -82,7 +82,7 @@ graph TD
 - WhatsApp: React-based web interface with chatbot UI
 
 - Shared component library
-### Smart Contract Details
+## Smart Contract Details
 #### Contract Address: 0x... <!-- Insert actual address -->
 
 #### Verified on: BaseScan <!-- Insert link -->
@@ -105,7 +105,7 @@ graph TD
 
 - Mainnet battle-tested since [DATE]
 
-### Development Stack
+## Development Stack
 #### Core Technologies
 Smart Contracts: Solidity, Foundry, OpenZeppelin
 
@@ -126,7 +126,7 @@ Infrastructure: MiniKit, Push Protocol, ENS
 }
 ```
 
-### Getting Started
+## Getting Started
 #### Prerequisites
 - Node.js v18+
 
@@ -169,7 +169,7 @@ cd ../ai-service
 pip install -r requirements.txt
 python main.py
 ```
-### Deployment Guide
+## Deployment Guide
 #### Contract Deployment
 ```bash
 Copy
@@ -194,7 +194,7 @@ ALCHEMY_API_KEY=your_key
 SENTRY_DSN=your_dsn
 MONGO_URI=mongodb://production-db
 ```
-### Security Features
+## Security Features
 #### Transaction Safeguards
 1. #### ENS Validation:
 
@@ -222,7 +222,7 @@ MONGO_URI=mongodb://production-db
 
 * Multi-sig for large transactions
 
-### Hackathon Deliverables
+## Hackathon Deliverables
 #### Mandatory Requirements
 
 | Requirement          | Implementation Details                          |
@@ -241,7 +241,7 @@ MONGO_URI=mongodb://production-db
 
 4. Social graph-based security
 
-### Contributing
+## Contributing
 Kirapod is 100% open-source under MIT License. We welcome contributions:
 
 1. **Fork the repository**  
@@ -263,7 +263,7 @@ Kirapod is 100% open-source under MIT License. We welcome contributions:
 
 5. Open a Pull Request
 
-### Why Base Network?
+## Why Base Network?
 1. **Efficiency**: Low-cost transactions ideal for social payments
 
 2. **Security**: Ethereum-equivalent security model
