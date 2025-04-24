@@ -4,7 +4,6 @@ venv/
 .env
 .env.local
 __pycache__
-migrations
 *.pyc
 *.pyo
 *.pyd
